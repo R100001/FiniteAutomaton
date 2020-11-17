@@ -26,20 +26,23 @@ namespace Automata {
 		// Define an automaton reading its states and transitions
 		FiniteAutomaton(std::fstream fin);
 
+		// Check if a word will be accepted by 'this' automaton
+		bool check_word(std::string word);
+
 	private:
 
 		static const char eTrans = '@';
 
-		struct transition {
+		struct Transition {
 
 			// This constructor should never be used
 			// It exists to avoid build error
 			// C2512: no appropriate default constructor available
-			transition()
+			Transition()
 				:prevState{ 0 }, symbol{ eTrans }, nextState{ 0 }{}
 
 			// Create a transition from one state to the next
-			transition(int prev, char sym, int next)
+			Transition(int prev, char sym, int next)
 				:prevState{ prev }, symbol{ sym }, nextState{ next }{}
 
 			int prevState;
@@ -51,9 +54,7 @@ namespace Automata {
 		int nStates;
 		int initState;
 		std::vector<int> finalStates;
-		std::vector<transition> transitions;
-
-		int currState;
+		std::vector<Transition> transitions;
 
 	}; // of class FiniteAutomaton
 

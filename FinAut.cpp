@@ -51,7 +51,7 @@ namespace Automata {
 		int nTransitions;
 		fin >> nTransitions;
 
-		transitions = std::vector<transition>(nTransitions);
+		transitions = std::vector<Transition>(nTransitions);
 
 		// Read transitions
 		for (unsigned int i = 0; i < transitions.size(); ++i) {
@@ -62,10 +62,65 @@ namespace Automata {
 			lineSs >> transitions[i].symbol;
 			lineSs >> transitions[i].nextState;
 		}
-
-		currState = initState;
 		
 	} // of constructor FiniteAutomaton
+
+//------------------------------------------------------------------------
+
+	// Check if a word will be accepted from 'this' automaton
+	// Inputs:
+	//		std::string word: the given word
+	// Outputs:
+	//		bool true: 'word' was accepted
+	//		bool false: 'word' was NOT accepted
+	//
+	bool FiniteAutomaton::check_word(std::string word) {
+
+		// Initialize the two vectors that will be holding the current
+		// and the future states respectivelly
+		std::vector<int> currStates{ initState };
+		std::vector<int> nextStates;
+
+		// For every symbol in the given 'word'
+		for (char symbol : word) {
+
+			// First check if a dead end was reached
+			if (!currStates.size()) return false;
+
+			// Then for every state check
+			for (int i = 0; i < currStates.size(); ++i)
+
+				// If any transition
+				for (const Transition& transition : transitions)
+
+					// Has the same starting state with the current one
+					if (currStates[i] == transition.prevState) {
+
+						// And check if the symbol is the same as the current symbol
+						if (symbol == transition.symbol)
+							nextStates.push_back(transition.nextState);
+
+						// Or there is an e-transition and we need to push_back
+						// the new states into the 'currStates' vector
+						if (transition.symbol == eTrans)
+							currStates.push_back(transition.nextState);
+
+					}
+
+			// Insert the new states into the 'currStates' vector
+			currStates.clear();
+			currStates = nextStates;
+			nextStates.clear();
+
+		}
+
+		// Check if any of the current states is a final one
+		for (int state : currStates)
+			for (int finalState : finalStates)
+				if (state == finalState) return true;
+		return false;
+
+	} // of function FiniteAutomaton::check_word
 
 //------------------------------------------------------------------------
 
