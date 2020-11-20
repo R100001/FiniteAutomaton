@@ -7,14 +7,18 @@
 
 namespace Automata {
 
-//------------------------------------------------------------------------
+	//------------------------------------------------------------------------
 
 	// Define an automaton reading its states and transitions
 	// Inputs:
 	//		std::fstream fin: A filestream with a definition for an automaton
 	// Outputs:
 	//
-	FiniteAutomaton::FiniteAutomaton(std::fstream fin) {
+	FiniteAutomaton::FiniteAutomaton(std::string infile) {
+
+		std::fstream fin{ infile };
+
+		filename = infile;
 
 		// Read number of states
 		fin >> nStates;
@@ -27,6 +31,10 @@ namespace Automata {
 		// Read number of final states
 		int nFinalStates;
 		fin >> nFinalStates;
+
+		// Extracting the newline character from 'fin'
+		fin.ignore();
+
 
 		finalStates = std::vector<int>(nFinalStates);
 
@@ -42,14 +50,19 @@ namespace Automata {
 		// Read final states
 		{
 			std::stringstream lineSs(line);
-			for (unsigned int i = 0; i < finalStates.size(); ++i)
+			for (unsigned int i = 0; i < finalStates.size(); ++i) {
 				lineSs >> finalStates[i];
+			}
 		}
 
 
 		// Read number of transitions
 		int nTransitions;
 		fin >> nTransitions;
+
+		// Extracting the newline character from 'fin'
+		fin.ignore();
+
 
 		transitions = std::vector<Transition>(nTransitions);
 
@@ -62,7 +75,7 @@ namespace Automata {
 			lineSs >> transitions[i].symbol;
 			lineSs >> transitions[i].nextState;
 		}
-		
+
 	} // of constructor FiniteAutomaton
 
 //------------------------------------------------------------------------
@@ -125,3 +138,5 @@ namespace Automata {
 //------------------------------------------------------------------------
 
 } // of namespace Automata
+
+//------------------------------------------------------------------------
