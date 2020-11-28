@@ -2,12 +2,13 @@
 //------------------------------------------------------------------------
 
 #include "FinAut.h"
+#include "AutErr.h"
 
 //------------------------------------------------------------------------
 
 namespace Automata {
 
-	//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
 	// Define an automaton reading its states and transitions
 	// Inputs:
@@ -18,19 +19,27 @@ namespace Automata {
 
 		std::fstream fin{ infile };
 
+		if (!fin) throw Errors(0, Errors::ErrorType::fileDoesNotExist);
+
 		filename = infile;
 
 		// Read number of states
 		fin >> nStates;
+		if (fin.bad() || nStates < 1) 
+			throw Errors(1, Errors::ErrorType::nStatesError);
 
 
 		// Read the initial state
 		fin >> initState;
+		if (fin.bad() || initState < 1 || initState > nStates)
+			throw Errors(2, Errors::ErrorType::initStateError);
 
 
 		// Read number of final states
 		int nFinalStates;
 		fin >> nFinalStates;
+		if (fin.bad() || nFinalStates < 0 || nFinalStates > nStates)
+			throw Errors(3, Errors::ErrorType::nFinalStatesError);
 
 		// Extracting the newline character from 'fin'
 		fin.ignore();
@@ -43,15 +52,26 @@ namespace Automata {
 		std::getline(fin, line);
 
 		// and replace ',' with ' ' for easier parsing
-		for (char& ch : line)
-			if (ch == ',')
+		int count = 1;
+		for (char& ch : line) {
+			if (!nFinalStates) throw Errors::ErrorType::providedFinalStatesError;
+			if (ch == ',') {
 				ch = ' ';
+				++count;
+			}
+		}
+
+		// Check if the number of final states provided agrees with nFinalStates 
+		if (count != nFinalStates)
+			throw Errors(4, Errors::ErrorType::providedFinalStatesError);
 
 		// Read final states
 		{
 			std::stringstream lineSs(line);
 			for (unsigned int i = 0; i < finalStates.size(); ++i) {
 				lineSs >> finalStates[i];
+				if (lineSs.bad() || finalStates[i] < 1 || finalStates[i] > nStates)
+					throw Errors(4, Errors::ErrorType::finalStatesError);
 			}
 		}
 
@@ -59,6 +79,8 @@ namespace Automata {
 		// Read number of transitions
 		int nTransitions;
 		fin >> nTransitions;
+		if (fin.bad() || nTransitions < 0)
+			Errors(5, Errors::ErrorType::nTransitionsError);
 
 		// Extracting the newline character from 'fin'
 		fin.ignore();
@@ -74,6 +96,10 @@ namespace Automata {
 			lineSs >> transitions[i].prevState;
 			lineSs >> transitions[i].symbol;
 			lineSs >> transitions[i].nextState;
+			if (lineSs.bad() ||
+				transitions[i].prevState < 0 || transitions[i].prevState > nStates ||
+				transitions[i].nextState < 0 || transitions[i].nextState > nStates)
+				throw Errors(6 + i, Errors::ErrorType::transitionsError);
 		}
 
 	} // of constructor FiniteAutomaton
@@ -87,7 +113,7 @@ namespace Automata {
 	//		bool true: 'word' was accepted
 	//		bool false: 'word' was NOT accepted
 	//
-	bool FiniteAutomaton::check_word(std::string word) {
+	bool FiniteAutomaton::check_word(std::string word) const{
 
 		// Initialize the two vectors that will be holding the current
 		// and the future states respectivelly
@@ -101,7 +127,7 @@ namespace Automata {
 			if (!currStates.size()) return false;
 
 			// Then for every state check
-			for (int i = 0; i < currStates.size(); ++i)
+			for (unsigned int i = 0; i < currStates.size(); ++i)
 
 				// If any transition
 				for (const Transition& transition : transitions)

@@ -139,9 +139,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AutErr.h" />
     <ClInclude Include="FinAut.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AutErr.cpp" />
     <ClCompile Include="FinAut.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>

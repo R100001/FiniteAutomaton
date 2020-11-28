@@ -27,10 +27,10 @@ namespace Automata {
 		FiniteAutomaton(std::string infile);
 
 		// Check if a word will be accepted by 'this' automaton
-		bool check_word(std::string word);
+		bool check_word(std::string word) const;
 		
 		// Get the name of the input file for 'this' automaton
-		operator std::string() { return filename; }
+		operator std::string() const { return filename; }
 
 	private:
 

@@ -18,12 +18,18 @@
     <ClInclude Include="FinAut.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AutErr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FinAut.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AutErr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
