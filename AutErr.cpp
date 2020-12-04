@@ -16,7 +16,8 @@ namespace Automata {
 	//		ErrorType error: The type of the error
 	// Outputs:
 	//
-	Errors::Errors(int line, ErrorType error) {
+	Errors::Errors(std::string infile, int line, ErrorType error) {
+		filename = infile;
 		eLine = line;
 		eType = error;
 	}
@@ -28,15 +29,15 @@ namespace Automata {
 	// Outputs:
 	//		std::string msg: A string containing the error description
 	//
-	std::string Errors::what() {
+	std::string Errors::what() const {
 
 		if (eType == ErrorType::fileDoesNotExist)
-			return "File does not exist!";
+			return "File " + filename + " does not exist!";
 
-		std::string msg = "Error in line: " + std::to_string(eLine) + '\n';
+		std::string msg = "Error in file: " + filename + "\nLine: " + std::to_string(eLine) + '\n';
 
 		if (eType == ErrorType::nStatesError)
-			msg += "Please use an integer in range [1," + std::to_string(INT_MAX) + "]";
+			msg += "Please use a positive integer";
 
 		else if (eType == ErrorType::initStateError)
 			msg += "Please use an integer in range [1,nStates]";
@@ -51,7 +52,7 @@ namespace Automata {
 			msg += "Please provide as many final states as were declared in the previous line";
 
 		else if (eType == ErrorType::nTransitionsError)
-			msg += "Please use an integer in range [0," + std::to_string(INT_MAX) + "]";
+			msg += "Please use a non-negative integer";
 
 		else if (eType == ErrorType::transitionsError)
 			msg += "Please use integers in range [1,nStates] and an appropriate symbol";

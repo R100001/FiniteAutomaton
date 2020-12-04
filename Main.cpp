@@ -2,6 +2,7 @@
 //------------------------------------------------------------------------
 
 #include <iostream>
+#include <filesystem>
 
 //------------------------------------------------------------------------
 
@@ -15,19 +16,54 @@
 //		std::vector<Automata::FiniteAutomaton>& automata: A vector containing all the defined automata
 // Outputs:
 //
-void define_new_automaton(std::vector<Automata::FiniteAutomaton>& automata) {
+void define_new_automaton(std::vector<Automata::FiniteAutomaton>& automata, bool folder) {
 
 	// Get input filename
-	std::cout << "Filename: ";
-	std::string infile;
-	std::cin >> infile;
+	std::cout << "Type 'back' to go back\n";
+	if (folder)
+		std::cout << "Folder name: ";
+	else
+		std::cout << "Filename: ";
+	std::string name;
+	std::cin >> name;
 	std::cout << '\n';
+	if (name == "back") return;
 
 	// Push the new automaton to the vector
 	try {
-		automata.push_back(Automata::FiniteAutomaton{ infile });
+		if (folder) {
+
+			// For every file in the folder 'name'
+			for (const auto& infile : std::filesystem::directory_iterator(name)) {
+
+				// Check if any automaton is already defined
+				bool alreadyDefined = false;
+				for (const Automata::FiniteAutomaton& automaton : automata) {
+					if (infile.path().string() == automaton) {
+						alreadyDefined = true;
+						break;
+					}
+				}
+
+				// If it not defined define it
+				if(!alreadyDefined)
+					automata.push_back(Automata::FiniteAutomaton{ infile.path().string() });
+			}
+		}
+		else {
+
+			// Check if automaton is already defined
+			for (const Automata::FiniteAutomaton& automaton : automata)
+				if (name == automaton) return;
+
+			// If it not defined define it
+			automata.push_back(Automata::FiniteAutomaton{ name });
+		}
 	}
-	catch (Automata::Errors e) {
+	catch (const Automata::Errors& e) {
+		std::cerr << e.what() << "\n\n";
+	}
+	catch (const std::runtime_error& e) {
 		std::cerr << e.what() << "\n\n";
 	}
 
@@ -50,17 +86,20 @@ void use_an_automaton(const std::vector<Automata::FiniteAutomaton>& automata) {
 
 	// Show appropriate message
 	std::cout << "Choose an automaton to use (1-" << automata.size() << "):\n";
+	std::cout << "0: Back\n";
 	for (unsigned int i = 0; i < automata.size(); ++i)
 		std::cout << i + 1 << ": " << (std::string)automata[i] << '\n';
 	std::cout << '\n';
 
 	// Get answer
-	int automatonNum = 0;
-	while (automatonNum < 1 || automatonNum > automata.size()) {
+	int automatonNum = -1;
+	while (std::cin.bad() || automatonNum < 0 || automatonNum > automata.size()) {
+		std::cout << ">> ";
 		std::cin >> automatonNum;
 		std::cin.clear();
 	}
 	std::cout << '\n';
+	if (!automatonNum) return;
 
 	// Check words
 	while (true) {
@@ -109,7 +148,7 @@ try {
 		std::cout << "What do you want to do?\n";
 		std::cout << "1: Insert new automaton\n";
 		std::cout << "2: Use an automaton\n";
-		std::cout << "3: Exit\n";
+		std::cout << "3: Exit\n\n";
 		std::cout << ">> ";
 
 		// Get input
@@ -119,7 +158,21 @@ try {
 
 		if (input == "1") {
 
-			define_new_automaton(automata);
+			std::cout << "0: Back\n";
+			std::cout << "1: Insert one automaton\n";
+			std::cout << "2: Insert automata from a folder\n\n";
+
+			int answer = -1;
+			while (std::cin.bad() || answer < 0 || answer > 2) {
+				std::cout << ">> ";
+				std::cin >> answer;
+				std::cin.clear(); 
+			}
+			std::cout << '\n';
+
+			if (!answer) continue;
+
+			define_new_automaton(automata, answer - 1);
 		}
 		else if (input == "2") {
 

@@ -25,13 +25,14 @@ namespace Automata {
 		};
 
 		// Create an error object giving the line that the error occured
-		Errors(int line, ErrorType error);
+		Errors(std::string infile, int line, ErrorType error);
 
 		// Get the error
-		std::string what();
+		std::string what() const;
 
 	private:
-		// Define the errors by the line that they occured
+		// Error characteristics
+		std::string filename;
 		int eLine;
 		ErrorType eType;
 

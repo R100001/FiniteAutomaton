@@ -41,6 +41,9 @@ namespace Automata {
 		// Get the name of the input file for 'this' automaton
 		operator std::string() const { return filename; }
 
+		// Check if an automaton is already defined
+		bool operator==(std::string filename) const;
+
 	private:
 
 		std::string filename;

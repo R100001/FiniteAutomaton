@@ -18,27 +18,27 @@ namespace Automata {
 
 		std::fstream fin{ infile };
 
-		if (!fin) throw Errors(0, Errors::ErrorType::fileDoesNotExist);
+		if (!fin) throw Errors(infile, 0, Errors::ErrorType::fileDoesNotExist);
 
 		filename = infile;
 
 		// Read number of states
 		fin >> nStates;
 		if (fin.bad() || nStates < 1) 
-			throw Errors(1, Errors::ErrorType::nStatesError);
+			throw Errors(infile, 1, Errors::ErrorType::nStatesError);
 
 
 		// Read the initial state
 		fin >> initState;
 		if (fin.bad() || initState < 1 || initState > nStates)
-			throw Errors(2, Errors::ErrorType::initStateError);
+			throw Errors(infile, 2, Errors::ErrorType::initStateError);
 
 
 		// Read number of final states
 		int nFinalStates;
 		fin >> nFinalStates;
 		if (fin.bad() || nFinalStates < 0 || nFinalStates > nStates)
-			throw Errors(3, Errors::ErrorType::nFinalStatesError);
+			throw Errors(infile, 3, Errors::ErrorType::nFinalStatesError);
 
 		// Extracting the newline character from 'fin'
 		fin.ignore();
@@ -53,7 +53,7 @@ namespace Automata {
 		// and replace ',' with ' ' for easier parsing
 		int count = 1;
 		for (char& ch : line) {
-			if (!nFinalStates) throw Errors::ErrorType::providedFinalStatesError;
+			if (!nFinalStates) throw Errors(infile, 4, Errors::ErrorType::providedFinalStatesError);
 			if (ch == ',') {
 				ch = ' ';
 				++count;
@@ -62,7 +62,7 @@ namespace Automata {
 
 		// Check if the number of final states provided agrees with nFinalStates 
 		if (count != nFinalStates)
-			throw Errors(4, Errors::ErrorType::providedFinalStatesError);
+			throw Errors(infile, 4, Errors::ErrorType::providedFinalStatesError);
 
 		// Read final states
 		{
@@ -70,7 +70,7 @@ namespace Automata {
 			for (unsigned int i = 0; i < finalStates.size(); ++i) {
 				lineSs >> finalStates[i];
 				if (lineSs.bad() || finalStates[i] < 1 || finalStates[i] > nStates)
-					throw Errors(4, Errors::ErrorType::finalStatesError);
+					throw Errors(infile, 4, Errors::ErrorType::finalStatesError);
 			}
 		}
 
@@ -79,7 +79,7 @@ namespace Automata {
 		int nTransitions;
 		fin >> nTransitions;
 		if (fin.bad() || nTransitions < 0)
-			Errors(5, Errors::ErrorType::nTransitionsError);
+			throw Errors(infile, 5, Errors::ErrorType::nTransitionsError);
 
 		// Extracting the newline character from 'fin'
 		fin.ignore();
@@ -89,16 +89,11 @@ namespace Automata {
 
 		// Read transitions
 		for (unsigned int i = 0; i < transitions.size(); ++i) {
-			std::getline(fin, line);
-			std::stringstream lineSs(line);
-
-			lineSs >> transitions[i].prevState;
-			lineSs >> transitions[i].symbol;
-			lineSs >> transitions[i].nextState;
-			if (lineSs.bad() ||
-				transitions[i].prevState < 0 || transitions[i].prevState > nStates ||
-				transitions[i].nextState < 0 || transitions[i].nextState > nStates)
-				throw Errors(6 + i, Errors::ErrorType::transitionsError);
+			fin >> transitions[i];
+			if (fin.bad() ||
+				transitions[i].prevState < 1 || transitions[i].prevState > nStates ||
+				transitions[i].nextState < 1 || transitions[i].nextState > nStates)
+				throw Errors(infile, 6 + i, Errors::ErrorType::transitionsError);
 		}
 
 	} // of constructor FiniteAutomaton
@@ -137,13 +132,31 @@ namespace Automata {
 					if (currStates[i] == transition.prevState) {
 
 						// And check if the symbol is the same as the current symbol
-						if (symbol == transition.symbol)
-							nextStates.push_back(transition.nextState);
+						if (symbol == transition.symbol) {
+
+							// Check if the 'transition.nextState' is already in the 'nextStates' vector
+							bool found = false;
+							for (unsigned int j = 0; j < nextStates.size(); ++j)
+								if (nextStates[j] == transition.nextState) {
+									found = true;
+									break;
+								}
+							if (!found) nextStates.push_back(transition.nextState);
+						}
 
 						// Or there is an e-transition and we need to push_back
 						// the new states into the 'currStates' vector
-						if (transition.symbol == Transition::eTrans)
-							currStates.push_back(transition.nextState);
+						if (transition.symbol == Transition::eTrans) {
+
+							// Check if the 'transition.nextState' is already in the 'currStates' vector
+							bool found = false;
+							for (unsigned int j = 0; j < currStates.size(); ++j)
+								if (currStates[j] == transition.nextState) {
+									found = true;
+									break;
+								}
+							if(!found) currStates.push_back(transition.nextState);
+						}
 
 					}
 
@@ -160,6 +173,23 @@ namespace Automata {
 		return false;
 
 	} // of function FiniteAutomaton::check_word
+
+//------------------------------------------------------------------------
+
+	bool FiniteAutomaton::operator==(std::string filename) const {
+
+		std::string automatonName = *this;
+
+		for (char& ch : automatonName)
+			if (ch == '\\' || ch == '/')
+				ch = ' ';
+
+		for (char& ch : filename)
+			if (ch == '\\' || ch == '/')
+				ch = ' ';
+
+		return automatonName == filename;
+	}
 
 //------------------------------------------------------------------------
 

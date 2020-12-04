@@ -5,6 +5,10 @@
 
 //------------------------------------------------------------------------
 
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
 namespace Automata {
 
 //------------------------------------------------------------------------
@@ -30,6 +34,21 @@ namespace Automata {
 		std::string symbols;
 
 		static const char eTrans = '@';
+
+		friend std::fstream& operator>>(std::fstream& fin, Automata::Transition& transition) {
+			std::string line;
+
+			std::getline(fin, line);
+			std::stringstream lineSs(line);
+
+			lineSs >> transition.prevState;
+			lineSs >> transition.symbol;
+			lineSs >> transition.nextState;
+
+			if (lineSs.bad()) fin.setstate(fin.badbit);
+
+			return fin;
+		}
 
 	}; // of struct transition
 
