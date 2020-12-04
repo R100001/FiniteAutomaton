@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClInclude Include="AutErr.h" />
     <ClInclude Include="FinAut.h" />
+    <ClInclude Include="Transition.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AutErr.cpp" />

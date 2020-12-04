@@ -2,7 +2,6 @@
 //------------------------------------------------------------------------
 
 #include "FinAut.h"
-#include "AutErr.h"
 
 //------------------------------------------------------------------------
 
@@ -115,6 +114,8 @@ namespace Automata {
 	//
 	bool FiniteAutomaton::check_word(std::string word) const{
 
+		if (!finalStates.size()) return false;
+
 		// Initialize the two vectors that will be holding the current
 		// and the future states respectivelly
 		std::vector<int> currStates{ initState };
@@ -123,7 +124,7 @@ namespace Automata {
 		// For every symbol in the given 'word'
 		for (char symbol : word) {
 
-			// First check if a dead end was reached
+			// First check if a dead end has been reached
 			if (!currStates.size()) return false;
 
 			// Then for every state check
@@ -141,13 +142,12 @@ namespace Automata {
 
 						// Or there is an e-transition and we need to push_back
 						// the new states into the 'currStates' vector
-						if (transition.symbol == eTrans)
+						if (transition.symbol == Transition::eTrans)
 							currStates.push_back(transition.nextState);
 
 					}
 
 			// Insert the new states into the 'currStates' vector
-			currStates.clear();
 			currStates = nextStates;
 			nextStates.clear();
 

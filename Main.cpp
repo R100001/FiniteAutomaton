@@ -124,13 +124,13 @@ try {
 		else if (input == "2") {
 
 			use_an_automaton(automata);
-
-		} else if (input == "3") break;
+		} 
+		else if (input == "3") break;
 
 	} // while (true) (program loop)
 
 }
-catch (std::runtime_error e) {
+catch (const std::exception& e) {
 	std::cerr << e.what() << '\n';
 }
 catch (...) {

@@ -13,6 +13,11 @@
 
 //------------------------------------------------------------------------
 
+#include "Transition.h"
+#include "AutErr.h"
+
+//------------------------------------------------------------------------
+
 namespace Automata {
 
 //------------------------------------------------------------------------
@@ -28,34 +33,17 @@ namespace Automata {
 
 		// Check if a word will be accepted by 'this' automaton
 		bool check_word(std::string word) const;
+
+		// TO DO
+		// Check if a word will be accepted by 'this' automaton more efficiently
+		// bool check_word_efficiently(std::string word) const;
 		
 		// Get the name of the input file for 'this' automaton
 		operator std::string() const { return filename; }
 
 	private:
 
-		struct Transition {
-
-			// This constructor should never be used
-			// It exists to avoid build error
-			// C2512: no appropriate default constructor available
-			Transition()
-				:prevState{ 0 }, symbol{ eTrans }, nextState{ 0 }{}
-
-			// Create a transition from one state to the next
-			Transition(int prev, char sym, int next)
-				:prevState{ prev }, symbol{ sym }, nextState{ next }{}
-
-			int prevState;
-			int nextState;
-			char symbol;
-
-		}; // of struct transition
-
-
 		std::string filename;
-
-		static const char eTrans = '@';
 
 		int nStates;
 		int initState;
@@ -67,3 +55,5 @@ namespace Automata {
 //------------------------------------------------------------------------
 
 } // of namespace Automata
+
+//------------------------------------------------------------------------

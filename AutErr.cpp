@@ -10,8 +10,10 @@ namespace Automata {
 //------------------------------------------------------------------------
 
 	// Create an error object giving the line that the error occured
+	// and the type of the error
 	// Inputs:
 	//		int line: The number of the line that the error occured
+	//		ErrorType error: The type of the error
 	// Outputs:
 	//
 	Errors::Errors(int line, ErrorType error) {
@@ -55,7 +57,11 @@ namespace Automata {
 			msg += "Please use integers in range [1,nStates] and an appropriate symbol";
 		
 		return msg;
-	}
+
+	} // of function Errors::what()
 
 //------------------------------------------------------------------------
-}
+
+} // of namespace Automata
+
+//------------------------------------------------------------------------
