@@ -110,7 +110,7 @@ void use_an_automaton(const std::vector<Automata::FiniteAutomaton>& automata) {
 		std::cin >> word;
 
 		// Check the word and show message
-		if (automata[automatonNum - 1].check_word(word))
+		if (automata[STATICCASTAUTOMATON(automatonNum) - 1].check_word_efficiently(word))
 			std::cout << "The word '" << word << "' was accepted!\n\n";
 		else
 			std::cout << "The word '" << word << "' was NOT accepted!\n\n";

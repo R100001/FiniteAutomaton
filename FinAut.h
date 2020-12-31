@@ -10,11 +10,23 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <unordered_set>
+#include <unordered_map>
 
 //------------------------------------------------------------------------
 
 #include "Transition.h"
 #include "AutErr.h"
+//#include "State.h"
+
+//------------------------------------------------------------------------
+
+#define STATICCASTAUTOMATON static_cast<std::vector<Automata::FiniteAutomaton, std::allocator<Automata::FiniteAutomaton>>::size_type>
+
+//------------------------------------------------------------------------
+
+typedef int state;
+typedef char symbol;
 
 //------------------------------------------------------------------------
 
@@ -22,27 +34,23 @@ namespace Automata {
 
 //------------------------------------------------------------------------
 
-	// An implementation of a deterministic or non-deterministic
-	// finite automaton
+	// An implementation of deterministic or non-deterministic
+	// finite automata
 	//
 	class FiniteAutomaton {
 
 	public:
-		// Define an automaton reading its states and transitions
+		// Define an automaton by reading its states and transitions
 		FiniteAutomaton(std::string infile);
 
 		// Check if a word will be accepted by 'this' automaton
 		bool check_word(std::string word) const;
 
-		// TO DO
 		// Check if a word will be accepted by 'this' automaton more efficiently
-		// bool check_word_efficiently(std::string word) const;
+		bool check_word_efficiently(std::string word) const;
 		
 		// Get the name of the input file for 'this' automaton
 		operator std::string() const { return filename; }
-
-		// Check if an automaton is already defined
-		bool operator==(std::string filename) const;
 
 	private:
 
@@ -50,10 +58,21 @@ namespace Automata {
 
 		int nStates;
 		int initState;
-		std::vector<int> finalStates;
+
+		std::vector<state> finalStates;
+		std::unordered_set<state> finalStatesSet;
+
 		std::vector<Transition> transitions;
+		std::unordered_set<symbol> symbols;
+		std::unordered_map<state, std::unordered_map<symbol, std::vector<state>>> outgoingTrans;
 
 	}; // of class FiniteAutomaton
+
+//------------------------------------------------------------------------
+
+	// Check if an automaton is already defined
+	// by checking the name of the input file
+	bool operator==(std::string filename, FiniteAutomaton automaton);
 
 //------------------------------------------------------------------------
 

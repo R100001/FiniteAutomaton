@@ -143,12 +143,14 @@
   <ItemGroup>
     <ClInclude Include="AutErr.h" />
     <ClInclude Include="FinAut.h" />
+    <ClInclude Include="State.h" />
     <ClInclude Include="Transition.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AutErr.cpp" />
     <ClCompile Include="FinAut.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Transition.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

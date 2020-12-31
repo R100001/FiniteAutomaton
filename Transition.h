@@ -7,7 +7,7 @@
 
 #include <fstream>
 #include <sstream>
-#include <iostream>
+#include <ostream>
 
 namespace Automata {
 
@@ -35,22 +35,13 @@ namespace Automata {
 
 		static const char eTrans = '@';
 
-		friend std::fstream& operator>>(std::fstream& fin, Automata::Transition& transition) {
-			std::string line;
-
-			std::getline(fin, line);
-			std::stringstream lineSs(line);
-
-			lineSs >> transition.prevState;
-			lineSs >> transition.symbol;
-			lineSs >> transition.nextState;
-
-			if (lineSs.bad()) fin.setstate(fin.badbit);
-
-			return fin;
-		}
-
 	}; // of struct transition
+
+//------------------------------------------------------------------------
+
+	std::fstream& operator>>(std::fstream& fin, Automata::Transition& transition);
+
+	std::ostream& operator<<(std::ostream& cout, Transition trans);
 
 //------------------------------------------------------------------------
 
